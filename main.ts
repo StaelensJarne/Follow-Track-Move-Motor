@@ -8,15 +8,17 @@ function Aftellen (vanaf: number) {
 }
 input.onButtonPressed(Button.A, function () {
     Aftellen(3)
-    DoeIets()
+    DoeIets(10)
     AllesAfwerken()
 })
-function DoeIets () {
-    for (let index = 0; index < 4; index++) {
+function DoeIets (seconden: number) {
+    maximumLoopTijd = input.runningTime() + seconden * 1000
+    while (input.runningTime() < maximumLoopTijd) {
         basic.showString("/")
         basic.pause(100)
         basic.showString("\\")
         basic.pause(100)
     }
 }
+let maximumLoopTijd = 0
 AllesAfwerken()
