@@ -6,6 +6,15 @@ function AllesAfwerken () {
     Kitronik_Move_Motor.motorOff(Kitronik_Move_Motor.Motors.MotorRight)
     basic.showIcon(IconNames.Happy)
 }
+function BeweegVooruit (seconden: number) {
+    maximumLoopTijd = input.runningTime() + seconden * 1000
+    StartLinksVooruit()
+    StartRechtsVooruit()
+    while (input.runningTime() < maximumLoopTijd) {
+        basic.showString("/")
+        basic.showString("\\")
+    }
+}
 function StartRechtsVooruit () {
     Kitronik_Move_Motor.motorOn(Kitronik_Move_Motor.Motors.MotorRight, Kitronik_Move_Motor.MotorDirection.Forward, 26)
 }
@@ -16,8 +25,7 @@ function Aftellen (vanaf: number) {
 }
 input.onButtonPressed(Button.A, function () {
     Aftellen(3)
-    StartRechtsVooruit()
-    basic.pause(1000)
+    BeweegVooruit(2)
     AllesAfwerken()
 })
 function StartLinksVooruit () {
