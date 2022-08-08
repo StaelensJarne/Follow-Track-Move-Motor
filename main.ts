@@ -1,3 +1,6 @@
+function Info (tekst: string) {
+	
+}
 function AllesAfwerken () {
     Kitronik_Move_Motor.motorOff(Kitronik_Move_Motor.Motors.MotorLeft)
     Kitronik_Move_Motor.motorOff(Kitronik_Move_Motor.Motors.MotorRight)
@@ -22,12 +25,15 @@ function StartLinksVooruit () {
 }
 input.onButtonPressed(Button.B, function () {
     Aftellen(3)
+    Info("Rechts starten om de motor links te draaien.")
     StartRechtsVooruit()
     basic.pause(1000)
     Kitronik_Move_Motor.motorOff(Kitronik_Move_Motor.Motors.MotorRight)
+    // Links starten door de motor rechts te draaien.
     StartLinksVooruit()
     basic.pause(1000)
     Kitronik_Move_Motor.motorOff(Kitronik_Move_Motor.Motors.MotorLeft)
+    // Afwerken.
     AllesAfwerken()
 })
 function DoeIets (seconden: number) {
