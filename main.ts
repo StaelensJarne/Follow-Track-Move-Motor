@@ -1,90 +1,60 @@
-function Info (tekst: string) {
-	
-}
-function AllesAfwerken () {
-    Kitronik_Move_Motor.motorOff(Kitronik_Move_Motor.Motors.MotorLeft)
-    Kitronik_Move_Motor.motorOff(Kitronik_Move_Motor.Motors.MotorRight)
-    basic.showIcon(IconNames.Happy)
-}
-function BeweegVooruit (seconden: number) {
-    maximumLoopTijd = input.runningTime() + seconden * 1000
-    StartLinksVooruit()
-    StartRechtsVooruit()
-    while (input.runningTime() < maximumLoopTijd) {
-        basic.showString("/")
-        basic.showString("\\")
-    }
-}
-function VolgSpoorRechts () {
-    Info("Rechter sensor loopt boven het spoor?")
-    if (Kitronik_Move_Motor.readSensor(Kitronik_Move_Motor.LfSensor.Right) == 1 || Kitronik_Move_Motor.readSensor(Kitronik_Move_Motor.LfSensor.Right) == 0) {
-        rechterSensorZietWit = false
-        StartLinksVooruit()
-    } else {
-        rechterSensorZietWit = true
-        Kitronik_Move_Motor.motorOff(Kitronik_Move_Motor.Motors.MotorRight)
-    }
-}
-function StartRechtsVooruit () {
-    Kitronik_Move_Motor.motorOn(Kitronik_Move_Motor.Motors.MotorRight, Kitronik_Move_Motor.MotorDirection.Forward, 26)
-}
-function Aftellen (vanaf: number) {
-    for (let index = 0; index <= vanaf; index++) {
-        basic.showString("" + (vanaf - index))
+function Aftellen () {
+    for (let index = 0; index <= 4; index++) {
+        moveMotorZIP.setZipLedColor(index, Kitronik_Move_Motor.colors(Kitronik_Move_Motor.ZipLedColors.Green))
+        moveMotorZIP.show()
+        basic.pause(1000)
     }
 }
 input.onButtonPressed(Button.A, function () {
-    Aftellen(3)
-    BeweegVooruit(2)
-    AllesAfwerken()
+    Aftellen()
+    ZetMotorKlaar()
+    VolgSpoor(10)
+    ZetMotorKlaar()
 })
-function StartLinksVooruit () {
-    Kitronik_Move_Motor.motorOn(Kitronik_Move_Motor.Motors.MotorLeft, Kitronik_Move_Motor.MotorDirection.Forward, 26)
+function ZetMotorKlaar () {
+    Kitronik_Move_Motor.motorOff(Kitronik_Move_Motor.Motors.MotorLeft)
+    Kitronik_Move_Motor.motorOff(Kitronik_Move_Motor.Motors.MotorRight)
+    moveMotorZIP = Kitronik_Move_Motor.createMoveMotorZIPLED(4)
+    ZetMotorLichten(5)
+}
+function BerekenSensorVerschil () {
+    sensorRechts = LeesLijnVolgSensorRechts()
+    sensorLinks = LeesLijnVolgSensorLinks()
+    sensorVerschil = Math.abs(sensorRechts - sensorLinks)
+    return sensorVerschil
+}
+function LeesLijnVolgSensorRechts () {
+    return Kitronik_Move_Motor.readSensor(Kitronik_Move_Motor.LfSensor.Right)
 }
 function VolgSpoor (seconden: number) {
-    maximumLoopTijd = input.runningTime() / (seconden * 1000)
-    blijfRijden = true
-    while (blijfRijden) {
-        Info("Motoren Aansturen")
-        VolgSpoorLinks()
-        VolgSpoorRechts()
-        Info("Stop waneer de tijd op is")
-        if (input.runningTime() >= maximumLoopTijd) {
-            blijfRijden = false
-        }
-        Info("Stop waneer het spoor onzichtbaar is")
-        if (linkerSensorZietWit && rechterSensorZietWit) {
-            blijfRijden = false
+    VolgSpoorTijd = input.runningTime() + seconden * 1000
+    waardeVolgSpoor = 0
+    ZetMotorLichten(1)
+    while (input.runningTime() < VolgSpoorTijd) {
+        basic.showNumber(waardeVolgSpoor)
+        waardeVolgSpoor = BerekenSensorVerschil()
+        if (25 < waardeVolgSpoor && waardeVolgSpoor < 35) {
+            ZetMotorLichten(2)
+        } else if (waardeVolgSpoor < 25) {
+            ZetMotorLichten(3)
+        } else if (waardeVolgSpoor > 35) {
+            ZetMotorLichten(4)
         }
     }
     Kitronik_Move_Motor.motorOff(Kitronik_Move_Motor.Motors.MotorLeft)
     Kitronik_Move_Motor.motorOff(Kitronik_Move_Motor.Motors.MotorRight)
 }
-input.onButtonPressed(Button.B, function () {
-    Aftellen(3)
-    VolgSpoor(10)
-})
-function VolgSpoorLinks () {
-    Info("Linker sensor loopt boven het spoor?")
-    if (Kitronik_Move_Motor.readSensor(Kitronik_Move_Motor.LfSensor.Left) == 1 || Kitronik_Move_Motor.readSensor(Kitronik_Move_Motor.LfSensor.Left) == 0) {
-        linkerSensorZietWit = false
-        StartRechtsVooruit()
-    } else {
-        linkerSensorZietWit = true
-        Kitronik_Move_Motor.motorOff(Kitronik_Move_Motor.Motors.MotorLeft)
-    }
+function ZetMotorLichten (kleur: number) {
+    moveMotorZIP.setColor(Kitronik_Move_Motor.colors(kleur))
+    moveMotorZIP.show()
 }
-function DoeIets (seconden: number) {
-    maximumLoopTijd = input.runningTime() + seconden * 1000
-    while (input.runningTime() < maximumLoopTijd) {
-        basic.showString("/")
-        basic.pause(100)
-        basic.showString("\\")
-        basic.pause(100)
-    }
+function LeesLijnVolgSensorLinks () {
+    return Kitronik_Move_Motor.readSensor(Kitronik_Move_Motor.LfSensor.Left)
 }
-let linkerSensorZietWit = false
-let blijfRijden = false
-let rechterSensorZietWit = false
-let maximumLoopTijd = 0
-AllesAfwerken()
+let waardeVolgSpoor = 0
+let VolgSpoorTijd = 0
+let sensorVerschil = 0
+let sensorLinks = 0
+let sensorRechts = 0
+let moveMotorZIP: Kitronik_Move_Motor.MoveMotorZIP = null
+ZetMotorKlaar()
