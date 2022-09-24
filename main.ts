@@ -1,6 +1,13 @@
+function LusVolgSpoor (seconden: number) {
+    maximumLoopTijd = input.runningTime() + seconden * 1000
+    while (input.runningTime() < maximumLoopTijd) {
+        basic.pause(5)
+        VolgSpoor()
+    }
+}
 function Aftellen () {
-    for (let index = 0; index <= 4; index++) {
-        basic.showNumber(4 - index)
+    for (let index = 0; index <= 3; index++) {
+        basic.showNumber(3 - index)
         moveMotorZIP.setZipLedColor(index, Kitronik_Move_Motor.colors(Kitronik_Move_Motor.ZipLedColors.Green))
         moveMotorZIP.show()
         basic.pause(1000)
@@ -8,13 +15,9 @@ function Aftellen () {
 }
 input.onButtonPressed(Button.A, function () {
     Aftellen()
-    seconden = 60
-    maximumLoopTijd = input.runningTime() + seconden * 1000
-    ZetLEDLichten(16711935)
-    while (input.runningTime() < maximumLoopTijd) {
-        basic.pause(5)
-        VolgSpoor()
-    }
+    ZetLEDLichten(65280)
+    basic.showIcon(IconNames.House)
+    LusVolgSpoor(55)
     ZetMoveMotorKlaar()
 })
 function LeesLijnVolgSensorRechts () {
@@ -37,6 +40,7 @@ function VolgSpoor () {
     }
 }
 function ZetMoveMotorKlaar () {
+    basic.showIcon(IconNames.Happy)
     moveMotorZIP = Kitronik_Move_Motor.createMoveMotorZIPLED(4)
     ZetLEDLichten(255)
 }
@@ -50,7 +54,6 @@ function LeesLijnVolgSensorLinks () {
 let sensorVerschil = 0
 let sensorLinks = 0
 let sensorRechts = 0
-let maximumLoopTijd = 0
-let seconden = 0
 let moveMotorZIP: Kitronik_Move_Motor.MoveMotorZIP = null
+let maximumLoopTijd = 0
 ZetMoveMotorKlaar()
